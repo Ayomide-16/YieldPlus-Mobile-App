@@ -1,0 +1,61 @@
+﻿name: yield_plus_farm_assistant
+description: AI-Powered Farm Assistant Mobile Application
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Supabase - Backend as a Service
+  supabase_flutter: any
+  
+  # State Management
+  provider: any
+  
+  # Local Storage (for offline mode)
+  shared_preferences: any
+  hive: any
+  hive_flutter: any
+  flutter_secure_storage: any
+  
+  # UI Components
+  cupertino_icons: any
+  google_fonts: any
+  flutter_svg: any
+  
+  # Forms & Validation
+  flutter_form_builder: any
+  form_builder_validators: any
+  
+  # Location & Maps
+  geolocator: any
+  
+  # Image Handling
+  image_picker: any
+  cached_network_image: any
+  
+  # Charts & Graphs
+  fl_chart: any
+  
+  # Utils
+  intl: any
+  uuid: any
+  url_launcher: any
+  connectivity_plus: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: any
+  hive_generator: any
+  build_runner: any
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/

@@ -1,0 +1,5 @@
+package com.yieldplus.yield_plus_farm_assistant
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()
