@@ -24,10 +24,7 @@ class _MyPlansScreenState extends State<MyPlansScreen> {
   Future<void> _loadPlans() async {
     try {
       final plans = await _planRepository.getSavedPlans();
-      setState(() {
-        _plans = plans;
-        _isLoading = false;
-      });
+      setState(() { _plans = plans; _isLoading = false; });
     } catch (e) {
       setState(() => _isLoading = false);
     }
@@ -41,14 +38,7 @@ class _MyPlansScreenState extends State<MyPlansScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _plans.isEmpty
               ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadPlans,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _plans.length,
-                    itemBuilder: (context, index) => _buildPlanCard(_plans[index]),
-                  ),
-                ),
+              : RefreshIndicator(onRefresh: _loadPlans, child: ListView.builder(padding: const EdgeInsets.all(16), itemCount: _plans.length, itemBuilder: (context, index) => _buildPlanCard(_plans[index]))),
     );
   }
 
@@ -59,14 +49,7 @@ class _MyPlansScreenState extends State<MyPlansScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(Icons.description, size: 64, color: AppColors.primary),
-            ),
+            Container(padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(20)), child: const Icon(Icons.description, size: 64, color: AppColors.primary)),
             const SizedBox(height: 24),
             Text('No Plans Yet', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
@@ -80,59 +63,29 @@ class _MyPlansScreenState extends State<MyPlansScreen> {
   Widget _buildPlanCard(SavedPlanModel plan) {
     IconData icon;
     Color color;
-    
     switch (plan.planType.toLowerCase()) {
-      case 'crop':
-        icon = Icons.grass;
-        color = Colors.green;
-        break;
-      case 'soil':
-        icon = Icons.science;
-        color = Colors.brown;
-        break;
-      case 'water':
-        icon = Icons.water_drop;
-        color = Colors.blue;
-        break;
-      case 'fertilizer':
-        icon = Icons.eco;
-        color = Colors.orange;
-        break;
-      default:
-        icon = Icons.description;
-        color = AppColors.primary;
+      case 'crop': icon = Icons.grass; color = Colors.green; break;
+      case 'soil': icon = Icons.science; color = Colors.brown; break;
+      case 'water': icon = Icons.water_drop; color = Colors.blue; break;
+      case 'fertilizer': icon = Icons.eco; color = Colors.orange; break;
+      default: icon = Icons.description; color = AppColors.primary;
     }
-    
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
-        leading: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: color),
-        ),
+        leading: Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: Icon(icon, color: color)),
         title: Text(plan.planName, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
             Text(plan.planType.toUpperCase(), style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500)),
-            Text('Created: \'),
+            Text('Created: ${plan.createdAt.toString().substring(0, 10)}'),
           ],
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () async {
-            await _planRepository.deleteSavedPlan(plan.id);
-            _loadPlans();
-          },
-        ),
+        trailing: IconButton(icon: const Icon(Icons.delete_outline), onPressed: () async { await _planRepository.deleteSavedPlan(plan.id); _loadPlans(); }),
       ),
     );
   }
 }
-

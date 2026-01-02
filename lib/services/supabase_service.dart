@@ -46,22 +46,6 @@ class SupabaseService {
     return client.from(table);
   }
 
-  // Real-time subscription
-  static RealtimeChannel subscribeToTable(
-    String table,
-    void Function(PostgresChangePayload) callback,
-  ) {
-    return client
-        .channel('public:\')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: table,
-          callback: callback,
-        )
-        .subscribe();
-  }
-
   // Storage methods
   static SupabaseStorageClient get storage => client.storage;
 
@@ -92,10 +76,9 @@ class SupabaseService {
     );
 
     if (response.status != 200) {
-      throw Exception('Edge function error: \');
+      throw Exception('Edge function error: ${response.status}');
     }
 
     return response.data as Map<String, dynamic>;
   }
 }
-
