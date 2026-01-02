@@ -5,7 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/constants/environment.dart';
 import 'core/theme/app_theme.dart';
 import 'services/auth_service.dart';
-import 'presentation/screens/auth/login_screen.dart';
+import 'presentation/providers/theme_provider.dart';
+import 'presentation/landing_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 
 void main() async {
@@ -31,18 +32,19 @@ class YieldPlusApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: Consumer<AuthService>(
-        builder: (context, authService, _) {
+      child: Consumer2<AuthService, ThemeProvider>(
+        builder: (context, authService, themeProvider, _) {
           return MaterialApp(
-            title: Environment.appName,
+            title: 'YieldPlus.AI',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.system,
+            themeMode: themeProvider.flutterThemeMode,
             home: authService.isAuthenticated
                 ? const HomeScreen()
-                : const LoginScreen(),
+                : const LandingScreen(),
           );
         },
       ),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/colors.dart';
 import '../../../services/auth_service.dart';
+import '../../widgets/common/theme_selector_widget.dart';
 import '../tools/soil_advisor_screen.dart';
 import '../tools/crop_planner_screen.dart';
 import '../tools/water_optimizer_screen.dart';
@@ -62,10 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Hello, $userName', style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
-              const Text('YieldPlus', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('YieldPlus.AI', style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
-          actions: [IconButton(icon: const Icon(Icons.notifications_outlined), onPressed: () {})],
+          actions: const [
+            ThemeSelectorWidget(),
+            SizedBox(width: 8),
+          ],
         ),
         SliverPadding(
           padding: const EdgeInsets.all(16),
@@ -154,6 +158,10 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [ThemeSelectorWidget()],
+            ),
             const SizedBox(height: 24),
             CircleAvatar(radius: 48, backgroundColor: AppColors.primary.withOpacity(0.1), child: const Icon(Icons.person, size: 48, color: AppColors.primary)),
             const SizedBox(height: 16),
