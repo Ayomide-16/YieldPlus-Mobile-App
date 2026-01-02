@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      \"Don't have an account? \",
+                      "Don't have an account? ",
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     TextButton(
@@ -195,3 +195,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

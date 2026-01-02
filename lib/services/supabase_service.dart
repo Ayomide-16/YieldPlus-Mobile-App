@@ -98,3 +98,4 @@ class SupabaseService {
     return response.data as Map<String, dynamic>;
   }
 }
+
