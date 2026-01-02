@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import '../../core/theme/colors.dart';
+import '../core/theme/colors.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 
@@ -96,7 +96,7 @@ class LandingScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              Text(subtitle, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
             ],
           ),
         ),
