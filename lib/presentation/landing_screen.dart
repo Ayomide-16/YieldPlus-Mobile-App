@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../core/theme/colors.dart';
+import '../core/theme/spacing.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 
@@ -10,97 +11,180 @@ class LandingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              const Spacer(flex: 1),
-              // Logo and Branding
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Icon(Icons.eco, size: 60, color: AppColors.primary),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'YieldPlus.AI',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'AI-Powered Farm Management\nat Your Fingertips',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const Spacer(flex: 1),
-              // Feature Highlights
-              _buildFeatureItem(context, Icons.grass, 'Smart Crop Recommendations', 'AI-powered suggestions for optimal yields'),
-              const SizedBox(height: 16),
-              _buildFeatureItem(context, Icons.analytics, 'Farm Analytics & Insights', 'Data-driven decisions for your farm'),
-              const SizedBox(height: 16),
-              _buildFeatureItem(context, Icons.science, 'Soil & Pest Analysis', 'Identify issues before they spread'),
-              const SizedBox(height: 16),
-              _buildFeatureItem(context, Icons.trending_up, 'Market Price Tracking', 'Get the best prices for your produce'),
-              const Spacer(flex: 2),
-              // Action Buttons
-              SizedBox(
+        child: Column(
+          children: [
+            // Hero Section with Gradient
+            Expanded(
+              flex: 3,
+              child: Container(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                decoration: const BoxDecoration(
+                  gradient: AppColors.heroGradient,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(32),
+                    bottomRight: Radius.circular(32),
                   ),
-                  child: const Text('Get Started'),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Logo Container
+                      Container(
+                        width: 88,
+                        height: 88,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                        ),
+                        child: const Icon(Icons.eco_rounded, size: 48, color: Colors.white),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      // App Name
+                      Text(
+                        'YieldPlus.AI',
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      // Tagline
+                      Text(
+                        'AI-Powered Farm Management\nAt Your Fingertips',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  ),
-                  child: const Text('I Already Have an Account'),
+            ),
+
+            // Features Section
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                child: Column(
+                  children: [
+                    const SizedBox(height: AppSpacing.lg),
+                    // Feature Grid
+                    Expanded(
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: AppSpacing.md,
+                        crossAxisSpacing: AppSpacing.md,
+                        childAspectRatio: 1.3,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: const [
+                          _FeatureCard(
+                            icon: Icons.grass_rounded,
+                            title: 'Crop Planning',
+                            subtitle: 'AI recommendations',
+                            color: Color(0xFF10B981),
+                          ),
+                          _FeatureCard(
+                            icon: Icons.science_rounded,
+                            title: 'Soil Analysis',
+                            subtitle: 'Nutrient insights',
+                            color: Color(0xFF8B5CF6),
+                          ),
+                          _FeatureCard(
+                            icon: Icons.water_drop_rounded,
+                            title: 'Water Usage',
+                            subtitle: 'Optimize irrigation',
+                            color: Color(0xFF3B82F6),
+                          ),
+                          _FeatureCard(
+                            icon: Icons.trending_up_rounded,
+                            title: 'Market Prices',
+                            subtitle: 'Live tracking',
+                            color: Color(0xFFF59E0B),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // CTA Buttons
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                        ),
+                        child: const Text('Get Started'),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        ),
+                        child: const Text('I Already Have an Account'),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildFeatureItem(BuildContext context, IconData icon, String title, String subtitle) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+class _FeatureCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+
+  const _FeatureCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.gray200, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: Icon(icon, color: color, size: 24),
           ),
-          child: Icon(icon, color: AppColors.primary, size: 24),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(subtitle, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-            ],
-          ),
-        ),
-      ],
+          const SizedBox(height: AppSpacing.sm),
+          Text(title, style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 2),
+          Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
+        ],
+      ),
     );
   }
 }
