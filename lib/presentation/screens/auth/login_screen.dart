@@ -33,15 +33,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final error = await authService.signIn(
+      final success = await authService.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
-      if (error != null) {
+      if (!success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error), backgroundColor: AppColors.error),
+            SnackBar(content: Text(authService.error ?? 'Login failed'), backgroundColor: AppColors.error),
           );
         }
       } else {
@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const HomeScreen()),
-            (route) => false, // Remove all routes
+            (route) => false,
           );
         }
       }
@@ -77,93 +77,44 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                // Logo
                 Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                  width: 80, height: 80,
+                  decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
                   child: const Icon(Icons.eco, size: 48, color: AppColors.primary),
                 ),
                 const SizedBox(height: 24),
-                Text(
-                  'Welcome Back',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
+                Text('Welcome Back', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
                 const SizedBox(height: 8),
-                Text(
-                  'Sign in to continue',
-                  style: TextStyle(color: AppColors.textSecondary),
-                  textAlign: TextAlign.center,
-                ),
+                Text('Sign in to continue', style: TextStyle(color: AppColors.textSecondary), textAlign: TextAlign.center),
                 const SizedBox(height: 40),
-                // Email Field
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
+                  decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined), border: OutlineInputBorder()),
+                  validator: (value) => value == null || value.isEmpty ? 'Please enter your email' : (!value.contains('@') ? 'Please enter a valid email' : null),
                 ),
                 const SizedBox(height: 16),
-                // Password Field
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                    ),
+                    labelText: 'Password', prefixIcon: const Icon(Icons.lock_outlined), border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off), onPressed: () => setState(() => _obscurePassword = !_obscurePassword)),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? 'Please enter your password' : (value.length < 6 ? 'Password must be at least 6 characters' : null),
                 ),
                 const SizedBox(height: 24),
-                // Sign In Button
                 ElevatedButton(
                   onPressed: _isLoading ? null : _signIn,
                   style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
-                  child: _isLoading
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Sign In'),
+                  child: _isLoading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Sign In'),
                 ),
                 const SizedBox(height: 24),
-                // Register Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("Don't have an account? ", style: Theme.of(context).textTheme.bodyMedium),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RegisterScreen()));
-                      },
-                      child: const Text('Sign Up'),
-                    ),
+                    TextButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RegisterScreen())), child: const Text('Sign Up')),
                   ],
                 ),
               ],
