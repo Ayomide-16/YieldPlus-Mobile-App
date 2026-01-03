@@ -2,6 +2,11 @@
 
 /// Service for calling AI-powered Edge Functions
 class EdgeFunctionService {
+  /// Helper to remove null values from map
+  static Map<String, dynamic> _removeNulls(Map<String, dynamic> map) {
+    return Map.fromEntries(map.entries.where((e) => e.value != null));
+  }
+
   /// Analyze soil conditions
   static Future<Map<String, dynamic>> analyzeSoil({
     required String color,
@@ -11,14 +16,14 @@ class EdgeFunctionService {
     String? soilPH,
     String? soilCompactness,
   }) async {
-    return await SupabaseService.callEdgeFunction('analyze-soil', {
+    return await SupabaseService.callEdgeFunction('analyze-soil', _removeNulls({
       'color': color,
       'texture': texture,
       'notes': notes,
       'imageBase64': imageBase64,
       'soilPH': soilPH,
       'soilCompactness': soilCompactness,
-    });
+    }));
   }
 
   /// Identify pest or disease
@@ -27,11 +32,11 @@ class EdgeFunctionService {
     required List<String> symptoms,
     required Map<String, dynamic> location,
   }) async {
-    return await SupabaseService.callEdgeFunction('identify-pest', {
+    return await SupabaseService.callEdgeFunction('identify-pest', _removeNulls({
       'cropType': cropType,
       'symptoms': symptoms,
       'location': location,
-    });
+    }));
   }
 
   /// Analyze crop recommendations
@@ -41,12 +46,12 @@ class EdgeFunctionService {
     double? farmSize,
     String? soilType,
   }) async {
-    return await SupabaseService.callEdgeFunction('analyze-crop', {
+    return await SupabaseService.callEdgeFunction('analyze-crop', _removeNulls({
       'cropName': cropName,
       'location': location,
       'farmSize': farmSize,
       'soilType': soilType,
-    });
+    }));
   }
 
   /// Analyze fertilizer needs
@@ -56,12 +61,12 @@ class EdgeFunctionService {
     required Map<String, dynamic> location,
     double? farmSize,
   }) async {
-    return await SupabaseService.callEdgeFunction('analyze-fertilizer', {
+    return await SupabaseService.callEdgeFunction('analyze-fertilizer', _removeNulls({
       'cropType': cropType,
       'soilType': soilType,
       'location': location,
       'farmSize': farmSize,
-    });
+    }));
   }
 
   /// Analyze water usage
@@ -71,12 +76,12 @@ class EdgeFunctionService {
     double? farmSize,
     String? irrigationType,
   }) async {
-    return await SupabaseService.callEdgeFunction('analyze-water', {
+    return await SupabaseService.callEdgeFunction('analyze-water', _removeNulls({
       'cropType': cropType,
       'location': location,
       'farmSize': farmSize,
       'irrigationType': irrigationType,
-    });
+    }));
   }
 
   /// Estimate market price
@@ -86,12 +91,12 @@ class EdgeFunctionService {
     double? quantity,
     String? unit,
   }) async {
-    return await SupabaseService.callEdgeFunction('estimate-market-price', {
+    return await SupabaseService.callEdgeFunction('estimate-market-price', _removeNulls({
       'cropName': cropName,
       'state': state,
       'quantity': quantity,
       'unit': unit,
-    });
+    }));
   }
 
   /// Generate comprehensive farm plan
@@ -102,22 +107,21 @@ class EdgeFunctionService {
     String? soilType,
     String? budget,
   }) async {
-    return await SupabaseService.callEdgeFunction('generate-comprehensive-plan', {
+    return await SupabaseService.callEdgeFunction('generate-comprehensive-plan', _removeNulls({
       'location': location,
       'farmSize': farmSize,
       'selectedCrops': selectedCrops,
       'soilType': soilType,
       'budget': budget,
-    });
+    }));
   }
 
   /// Get climate data for location
   static Future<Map<String, dynamic>> getClimateData({
     required Map<String, dynamic> location,
   }) async {
-    return await SupabaseService.callEdgeFunction('get-climate-data', {
+    return await SupabaseService.callEdgeFunction('get-climate-data', _removeNulls({
       'location': location,
-    });
+    }));
   }
 }
-

@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../core/theme/colors.dart';
 import '../../../services/auth_service.dart';
+import '../home/home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,32 +26,48 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final success = await authService.signIn(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-
-    setState(() => _isLoading = false);
-
-    if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authService.error ?? 'Login failed'),
-          backgroundColor: AppColors.error,
-        ),
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final error = await authService.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
+
+      if (error != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error), backgroundColor: AppColors.error),
+          );
+        }
+      } else {
+        // Success - Navigate to HomeScreen
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            (route) => false, // Remove all routes
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Sign In'), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -60,8 +76,8 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 48),
-                // Logo and Title
+                const SizedBox(height: 40),
+                // Logo
                 Container(
                   width: 80,
                   height: 80,
@@ -69,37 +85,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: AppColors.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Icon(
-                    Icons.eco,
-                    size: 48,
-                    color: AppColors.primary,
-                  ),
+                  child: const Icon(Icons.eco, size: 48, color: AppColors.primary),
                 ),
                 const SizedBox(height: 24),
                 Text(
                   'Welcome Back',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to continue to YieldPlus',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                  'Sign in to continue',
+                  style: TextStyle(color: AppColors.textSecondary),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 40),
                 // Email Field
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    hintText: 'Enter your email',
                     prefixIcon: Icon(Icons.email_outlined),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -118,17 +126,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    hintText: 'Enter your password',
                     prefixIcon: const Icon(Icons.lock_outlined),
+                    border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                      ),
-                      onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
-                      },
+                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
                   ),
                   validator: (value) {
@@ -141,29 +143,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // TODO: Navigate to forgot password
-                    },
-                    child: const Text('Forgot Password?'),
-                  ),
-                ),
                 const SizedBox(height: 24),
-                // Login Button
+                // Sign In Button
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
+                  onPressed: _isLoading ? null : _signIn,
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
                   child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                       : const Text('Sign In'),
                 ),
                 const SizedBox(height: 24),
@@ -171,17 +157,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    Text("Don't have an account? ", style: Theme.of(context).textTheme.bodyMedium),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const RegisterScreen(),
-                          ),
-                        );
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RegisterScreen()));
                       },
                       child: const Text('Sign Up'),
                     ),
@@ -195,4 +174,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

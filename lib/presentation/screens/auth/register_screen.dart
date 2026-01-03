@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../core/theme/colors.dart';
 import '../../../services/auth_service.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -20,6 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _registrationComplete = false;
 
   @override
   void dispose() {
@@ -30,44 +31,122 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  Future<void> _handleRegister() async {
+  Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final success = await authService.signUp(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      fullName: _nameController.text.trim(),
-    );
-
-    setState(() => _isLoading = false);
-
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created successfully!'),
-          backgroundColor: AppColors.primary,
-        ),
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      final error = await authService.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        fullName: _nameController.text.trim(),
       );
-      Navigator.of(context).pop();
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authService.error ?? 'Registration failed'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+
+      if (error != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error), backgroundColor: AppColors.error),
+          );
+        }
+      } else {
+        // Show verification message
+        setState(() => _registrationComplete = true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_registrationComplete) {
+      return _buildVerificationScreen();
+    }
+    return _buildRegistrationForm();
+  }
+
+  Widget _buildVerificationScreen() {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Account'),
+      appBar: AppBar(title: const Text('Check Your Email')),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: const Icon(Icons.mark_email_read, size: 64, color: AppColors.primary),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'Verify Your Email',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'We have sent a verification link to:',
+                style: TextStyle(color: AppColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _emailController.text,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Please check your inbox and click the verification link to activate your account.',
+                style: TextStyle(color: AppColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
+                    );
+                  },
+                  child: const Text('Go to Login'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Verification email resent!')),
+                  );
+                },
+                icon: const Icon(Icons.refresh),
+                label: const Text('Resend Verification Email'),
+              ),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildRegistrationForm() {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Create Account'), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -76,31 +155,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 Text(
-                  'Join YieldPlus',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  'Join YieldPlus.AI',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Create an account to start smart farming',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                  'Create your account to get started',
+                  style: TextStyle(color: AppColors.textSecondary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
-                // Full Name Field
+                // Name Field
                 TextFormField(
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
                   decoration: const InputDecoration(
                     labelText: 'Full Name',
-                    hintText: 'Enter your full name',
                     prefixIcon: Icon(Icons.person_outlined),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -116,8 +191,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    hintText: 'Enter your email',
                     prefixIcon: Icon(Icons.email_outlined),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -136,17 +211,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    hintText: 'Create a password',
                     prefixIcon: const Icon(Icons.lock_outlined),
+                    border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                      ),
-                      onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
-                      },
+                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
                   ),
                   validator: (value) {
@@ -166,42 +235,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: _obscureConfirmPassword,
                   decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    hintText: 'Confirm your password',
                     prefixIcon: const Icon(Icons.lock_outlined),
+                    border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                      ),
-                      onPressed: () {
-                        setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
-                      },
+                      icon: Icon(_obscureConfirmPassword ? Icons.visibility : Icons.visibility_off),
+                      onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                     ),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
-                    }
                     if (value != _passwordController.text) {
                       return 'Passwords do not match';
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
-                // Register Button
+                const SizedBox(height: 24),
+                // Sign Up Button
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _handleRegister,
+                  onPressed: _isLoading ? null : _signUp,
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
                   child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                       : const Text('Create Account'),
                 ),
                 const SizedBox(height: 24),
@@ -209,10 +263,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Already have an account? ',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    Text('Already have an account? ', style: Theme.of(context).textTheme.bodyMedium),
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Sign In'),
